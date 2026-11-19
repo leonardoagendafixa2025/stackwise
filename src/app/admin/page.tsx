@@ -15,14 +15,19 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import Link from "next/link";
 import { getAffiliateClickStats } from "@/services/affiliate";
 import { getProducts } from "@/services/catalog";
+import { getFinancialSummary } from "@/services/financial";
 
 export const revalidate = 0; // Fresh metrics
 
 export default async function AdminDashboardPage() {
-  const [clickStats, products] = await Promise.all([
+  const [clickStats, products, financial] = await Promise.all([
     getAffiliateClickStats(),
     getProducts({ publishedOnly: false }),
+    getFinancialSummary(),
   ]);
+
+  const formatBRL = (val: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val);
 
   // Itens que requerem atenção estrita do proprietário (conforme Seção 12)
   const attentionItems: AttentionItem[] = [
@@ -100,17 +105,17 @@ export default async function AdminDashboardPage() {
         />
         <MetricCard
           title="Comissões Aprovadas"
-          value="R$ 380,00"
-          subtitle="Pendentes de pagamento: R$ 120,00"
+          value={formatBRL(financial.approvedCommissions)}
+          subtitle={`Pendentes de repasse: ${formatBRL(financial.pendingCommissions)}`}
           badge="Auditado"
           icon={DollarSign}
         />
         <MetricCard
-          title="Faturamento Acumulado"
-          value="R$ 1.420,00"
-          subtitle="Meta aspiracional: R$ 1.000.000"
-          delta="Fase 2 / Monetização"
-          deltaType="neutral"
+          title="Receita Realizada (Paga)"
+          value={formatBRL(financial.grossRevenue)}
+          subtitle={`Meta R$ 1M: ${financial.targetProgressPercentage}%`}
+          delta="Financeiro Live"
+          deltaType="positive"
           icon={TrendingUp}
         />
       </div>
