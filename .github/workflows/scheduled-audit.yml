@@ -1,0 +1,32 @@
+name: STACKWISE Autonomous Scheduled Link Audit & Health Check
+
+on:
+  schedule:
+    # Run twice daily at 00:00 and 12:00 UTC (Cost: R$ 0.00 within GitHub Actions Free Tier)
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  audit:
+    name: Execute Autonomous Link Auditor (Agent 4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Autonomous Auditor Script
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/run_cron_audit.mjs

@@ -61,14 +61,35 @@ export async function parseAndProcessCommissionsCSV(
       .maybeSingle();
 
     if (link) {
-      await supabase.from("affiliate_conversions").insert({
-        link_id: link.id,
-        external_conversion_id: conversionId,
-        amount: saleAmount,
-        commission_amount: commissionAmount,
-        status,
-        conversion_date: dateStr ? new Date(dateStr).toISOString() : new Date().toISOString(),
-      });
+      // Idempotency check: see if external_conversion_id already exists to avoid duplication
+      const { data: existing } = await supabase
+        .from("affiliate_conversions")
+        .select("id")
+        .eq("external_conversion_id", conversionId)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing conversion (idempotent update)
+        await supabase
+          .from("affiliate_conversions")
+          .update({
+            amount: saleAmount,
+            commission_amount: commissionAmount,
+            status,
+            conversion_date: dateStr ? new Date(dateStr).toISOString() : new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+      } else {
+        // Insert new conversion record
+        await supabase.from("affiliate_conversions").insert({
+          link_id: link.id,
+          external_conversion_id: conversionId,
+          amount: saleAmount,
+          commission_amount: commissionAmount,
+          status,
+          conversion_date: dateStr ? new Date(dateStr).toISOString() : new Date().toISOString(),
+        });
+      }
       processed += 1;
     }
   }

@@ -16,6 +16,7 @@ import {
   Inbox,
   Settings,
   ExternalLink,
+  Activity,
 } from "lucide-react";
 
 export function AdminSidebar() {
@@ -28,6 +29,7 @@ export function AdminSidebar() {
     { href: "/admin/editorial", label: "Editorial & Artigos", icon: FileText },
     { href: "/admin/agents", label: "Central dos 7 Agentes", icon: Bot },
     { href: "/admin/financial", label: "Financeiro & CSVs", icon: DollarSign },
+    { href: "/admin/automation", label: "Automação & Estabilidade", icon: Activity },
     { href: "/admin/seo", label: "SEO & Oportunidades", icon: Search },
     { href: "/admin/leads", label: "Leads de Sistemas", icon: Inbox },
     { href: "/admin/settings", label: "Orçamento (R$ 0) & Ajustes", icon: Settings },
