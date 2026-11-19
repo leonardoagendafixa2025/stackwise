@@ -1,0 +1,148 @@
+export type Locale = "pt-br" | "en";
+
+export const defaultLocale: Locale = "pt-br";
+export const locales: Locale[] = ["pt-br", "en"];
+
+export const dictionaries = {
+  "pt-br": {
+    brand: {
+      name: "STACKWISE",
+      slogan: "Descubra. Compare. Escolha Melhor.",
+      tagline: "Plataforma independente de descoberta e recomendação de softwares para empresas inteligentes.",
+    },
+    nav: {
+      categories: "Categorias",
+      comparisons: "Comparações",
+      alternatives: "Alternativas",
+      editorial: "Guias & Análises",
+      customSystems: "Sistemas Sob Medida",
+      admin: "Central de Operações",
+      searchPlaceholder: "Pesquise por nome, categoria ou funcionalidade...",
+    },
+    hero: {
+      badge: "Independência Editorial & Dados Verificados",
+      title: "Encontre a ferramenta ideal para a sua empresa crescer.",
+      subtitle: "Comparações técnicas, preços transparentes e análises estruturadas. Sem opiniões fabricadas, sem promoções enganosas.",
+      searchCta: "Buscar Softwares",
+      viewCategories: "Explorar Categorias",
+    },
+    home: {
+      categoriesTitle: "Categorias Principais",
+      categoriesSubtitle: "Encontre as melhores soluções digitais divididas por área de atuação.",
+      featuredTitle: "Softwares em Destaque",
+      featuredSubtitle: "Soluções amplamente adotadas e rigorosamente verificadas por nossa equipe.",
+      compareTitle: "Comparações Populares",
+      compareSubtitle: "Duelo de recursos lado a lado para embasar sua decisão com fatos.",
+      transparencyTitle: "Aviso de Transparência Editorial e Afiliados",
+      transparencyText: "A STACKWISE é uma plataforma de pesquisa mantida de forma independente. Para manter nosso serviço gratuito e de acesso aberto, podemos receber comissões de programas de afiliados quando você clica em links de parceiros e contrata um software. Isso não gera nenhum custo adicional para você e não interfere em nossas análises e critérios de avaliação técnica.",
+      howWeEvaluate: "Como avaliamos ferramentas",
+    },
+    product: {
+      freePlan: "Plano Gratuito Disponível",
+      paidOnly: "Apenas Planos Pagos",
+      freeTrial: "dias de teste gratuito",
+      verifiedAt: "Última verificação em",
+      officialSite: "Acessar Fornecedor Oficial",
+      features: "Recursos Principais",
+      pros: "Vantagens Confirmadas",
+      cons: "Limitações Conhecidas",
+      pricing: "Preços & Planos Verificados",
+      alternatives: "Alternativas Recomendadas",
+      source: "Fonte da informação",
+    },
+    commercial: {
+      badge: "Consultoria & Arquitetura de Software",
+      title: "Precisa de um Sistema Personalizado?",
+      subtitle: "Nossa IA analisa suas necessidades técnicas, desenha o escopo de funcionalidades e entrega um briefing estruturado diretamente para avaliação do nosso time de engenharia.",
+      nameLabel: "Seu Nome Completo",
+      emailLabel: "E-mail Corporativo",
+      companyLabel: "Nome da Empresa ou Projeto",
+      summaryLabel: "Qual desafio o sistema deve resolver?",
+      budgetLabel: "Faixa de Investimento Prevista",
+      submitButton: "Enviar para Análise e Gerar Briefing",
+      successTitle: "Solicitação Recebida com Sucesso!",
+      successMessage: "Nosso Agente Comercial já está sintetizando os requisitos preliminares. O proprietário analisará o briefing e entrará em contato se houver alinhamento.",
+    },
+    footer: {
+      about: "Sobre a STACKWISE",
+      disclosure: "Divulgação de Afiliados",
+      privacy: "Política de Privacidade",
+      terms: "Termos de Uso",
+      contact: "Contato",
+      copyright: "Todos os direitos reservados. Informações comerciais sujeitas a alterações pelos fornecedores.",
+    },
+  },
+  en: {
+    brand: {
+      name: "STACKWISE",
+      slogan: "Discover. Compare. Choose Smarter.",
+      tagline: "Independent discovery and recommendation platform for enterprise SaaS and digital toolkits.",
+    },
+    nav: {
+      categories: "Categories",
+      comparisons: "Comparisons",
+      alternatives: "Alternatives",
+      editorial: "Guides & Insights",
+      customSystems: "Custom Systems",
+      admin: "Operations Hub",
+      searchPlaceholder: "Search software, category, or features...",
+    },
+    hero: {
+      badge: "Editorial Independence & Verified Metrics",
+      title: "Find the exact software your company needs to scale.",
+      subtitle: "Technical head-to-head comparisons, transparent pricing, and factual evaluations. No fake reviews, no inflated ratings.",
+      searchCta: "Search Softwares",
+      viewCategories: "Explore Categories",
+    },
+    home: {
+      categoriesTitle: "Core Software Categories",
+      categoriesSubtitle: "Curated digital tools organized by business function and growth stage.",
+      featuredTitle: "Featured Software Solutions",
+      featuredSubtitle: "Vetted SaaS tools verified for compliance, pricing integrity, and performance.",
+      compareTitle: "Popular Comparisons",
+      compareSubtitle: "Side-by-side feature breakdowns based on verified structural data.",
+      transparencyTitle: "Editorial & Affiliate Disclosure",
+      transparencyText: "STACKWISE is an independently operated research platform. To keep our benchmarks and directories completely free for users, we may earn affiliate commissions when you purchase through our links. This incurs no extra cost to you and does not compromise our technical criteria.",
+      howWeEvaluate: "How we evaluate software",
+    },
+    product: {
+      freePlan: "Free Plan Available",
+      paidOnly: "Paid Plans Only",
+      freeTrial: "days free trial",
+      verifiedAt: "Last verified on",
+      officialSite: "Visit Official Provider",
+      features: "Key Verified Features",
+      pros: "Confirmed Advantages",
+      cons: "Known Limitations",
+      pricing: "Verified Pricing & Plans",
+      alternatives: "Recommended Alternatives",
+      source: "Verified official source",
+    },
+    commercial: {
+      badge: "Software Architecture & Custom Systems",
+      title: "Need a Custom Software System?",
+      subtitle: "Our AI evaluates your requirements, maps functional workflows, and creates a structured technical briefing for our senior engineering team.",
+      nameLabel: "Your Full Name",
+      emailLabel: "Business Email",
+      companyLabel: "Company or Project Name",
+      summaryLabel: "What problem should the custom system solve?",
+      budgetLabel: "Target Budget Range",
+      submitButton: "Submit for Analysis & Generate Briefing",
+      successTitle: "Request Received Successfully!",
+      successMessage: "Our Commercial Agent is drafting the initial technical specs. The platform owner will review the scope and reach out.",
+    },
+    footer: {
+      about: "About STACKWISE",
+      disclosure: "Affiliate Disclosure",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+      contact: "Contact",
+      copyright: "All rights reserved. SaaS terms, pricing and conditions are subject to change by official providers.",
+    },
+  },
+} as const;
+
+export function getDictionary(locale: string = "pt-br") {
+  const normalized = locale.toLowerCase() === "en" ? "en" : "pt-br";
+  return dictionaries[normalized];
+}
