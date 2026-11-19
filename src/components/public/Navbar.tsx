@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "@/lib/i18n/dictionaries";
-import { ShieldCheck, Compass, SlidersHorizontal, Sparkles, Layers, BookOpen } from "lucide-react";
+import { ShieldCheck, Compass, SlidersHorizontal, Sparkles, Layers, BookOpen, ShoppingBag } from "lucide-react";
 
 interface NavbarProps {
   locale: Locale;
@@ -59,6 +59,13 @@ export function Navbar({ locale }: NavbarProps) {
           >
             <Sparkles className="h-4 w-4 text-blue-600" />
             {dict.nav.customSystems}
+          </Link>
+          <Link
+            href={`/${locale}/store`}
+            className="flex items-center gap-1.5 transition-colors text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold"
+          >
+            <ShoppingBag className="h-4 w-4 text-emerald-600" />
+            {locale === "pt-br" ? "Loja Digital" : "Digital Store"}
           </Link>
         </nav>
 
