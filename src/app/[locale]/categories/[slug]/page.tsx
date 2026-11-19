@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { type Locale } from "@/lib/i18n/dictionaries";
 import {
   CheckCircle2,
@@ -10,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { getCategoryBySlug, getProducts } from "@/services/catalog";
 
 interface CategorySlugProps {
   params: {
@@ -18,70 +20,20 @@ interface CategorySlugProps {
   };
 }
 
-export default function CategoryDetailPage({ params }: CategorySlugProps) {
+export const revalidate = 60;
+
+export default async function CategoryDetailPage({ params }: CategorySlugProps) {
   const { locale, slug } = params;
+  const isPt = locale === "pt-br";
 
-  // Sample verified category items
-  const categoryTitles: Record<string, { pt: string; en: string; descPt: string; descEn: string }> = {
-    "crm": {
-      pt: "CRM & Vendas",
-      en: "CRM & Sales",
-      descPt: "Softwares de gestão comercial, automação de pipeline e relacionamento com clientes.",
-      descEn: "Sales pipeline tracking, deal closing, and customer relationship solutions.",
-    },
-    "inteligencia-artificial": {
-      pt: "Inteligência Artificial",
-      en: "Artificial Intelligence",
-      descPt: "Modelos cognitivos, assistentes de IA generativa e automação de texto/imagem.",
-      descEn: "Cognitive AI engines, generative models, and enterprise assistant tools.",
-    },
-    "automacao": {
-      pt: "Automação de Processos",
-      en: "Workflow Automation",
-      descPt: "Plataformas de integração webhooks, rotinas no-code e sincronização de dados.",
-      descEn: "No-code integration connectors, webhooks, and multi-app orchestration.",
-    },
-  };
+  const [category, products] = await Promise.all([
+    getCategoryBySlug(slug),
+    getProducts({ categorySlug: slug }),
+  ]);
 
-  const currentCategory = categoryTitles[slug] || {
-    pt: slug.replace(/-/g, " ").toUpperCase(),
-    en: slug.replace(/-/g, " ").toUpperCase(),
-    descPt: "Ferramentas catalogadas e verificadas editorialmente.",
-    descEn: "Audited and editorially verified software solutions.",
-  };
-
-  const sampleProducts = [
-    {
-      name: "HubSpot CRM",
-      slug: "hubspot",
-      rating: 4.8,
-      verifiedPrice: "Grátis / A partir de $20/mês",
-      hasFreePlan: true,
-      freeTrialDays: 14,
-      verifiedAt: "18/11/2026",
-      summary:
-        locale === "pt-br"
-          ? "Líder global de mercado em CRM integrado com automação de marketing e vendas para PMEs e empresas em escala."
-          : "Market-leading CRM tightly integrated with inbound marketing and sales automation for growing teams.",
-      features: ["Pipeline Visual de Vendas", "Formulários e Landing Pages", "Rastreamento de E-mails", "Gestão de Contatos Ilimitada"],
-      affiliateSlug: "hubspot",
-    },
-    {
-      name: "Pipedrive",
-      slug: "pipedrive",
-      rating: 4.6,
-      verifiedPrice: "A partir de $14/mês",
-      hasFreePlan: false,
-      freeTrialDays: 14,
-      verifiedAt: "15/11/2026",
-      summary:
-        locale === "pt-br"
-          ? "CRM desenhado por vendedores para vendedores, focado em alta velocidade de fechamento e visualização de funil."
-          : "Sales-first CRM built by dealmakers, focusing on deal velocity and streamlined pipeline visualization.",
-      features: ["Funis Personalizáveis", "Assistente de Vendas com IA", "Automação de Tarefas", "Relatórios de Desempenho"],
-      affiliateSlug: "pipedrive",
-    },
-  ];
+  if (!category) {
+    notFound();
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 space-y-8">
@@ -92,86 +44,108 @@ export default function CategoryDetailPage({ params }: CategorySlugProps) {
         <Link href={`/${locale}/categories`} className="hover:underline">Categorias</Link>
         <ChevronRight className="h-3 w-3" />
         <span className="font-semibold text-slate-900 dark:text-slate-100">
-          {locale === "pt-br" ? currentCategory.pt : currentCategory.en}
+          {isPt ? category.name_pt : category.name_en}
         </span>
       </nav>
 
       {/* Header */}
       <div className="border-b border-slate-200 pb-6 dark:border-slate-800">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-          {locale === "pt-br" ? currentCategory.pt : currentCategory.en}
+          {isPt ? category.name_pt : category.name_en}
         </h1>
-        <p className="text-sm text-slate-500 mt-2">
-          {locale === "pt-br" ? currentCategory.descPt : currentCategory.descEn}
+        <p className="text-sm text-slate-500 mt-2 max-w-3xl">
+          {isPt ? category.description_pt : category.description_en}
         </p>
       </div>
 
       {/* Product List */}
       <div className="space-y-6">
-        {sampleProducts.map((p) => (
-          <Card key={p.slug} className="p-6 hover:border-slate-300 transition-all">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="space-y-3 max-w-3xl">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                    {p.name}
-                  </h2>
-                  <div className="flex items-center gap-1 text-xs font-bold text-amber-500">
-                    <Star className="h-4 w-4 fill-current" />
-                    <span>{p.rating}</span>
-                  </div>
-                  <Badge variant="verified" className="text-[11px]">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Preços Verificados
-                  </Badge>
-                </div>
-
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {p.summary}
-                </p>
-
-                {/* Features Badges */}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {p.features.map((f) => (
-                    <span
-                      key={f}
-                      className="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                    >
-                      {f}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pricing & CTA */}
-              <div className="lg:w-64 shrink-0 rounded-xl bg-slate-50 p-4 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3 text-center">
-                <div className="text-xs text-slate-500">Faixa de Preço</div>
-                <div className="text-sm font-bold text-slate-900 dark:text-white">
-                  {p.verifiedPrice}
-                </div>
-                <div className="text-[11px] text-slate-400">
-                  {p.hasFreePlan ? "Plano Grátis Disponível" : `${p.freeTrialDays} dias de teste gratuito`}
-                </div>
-
-                <Link
-                  href={`/go/${p.affiliateSlug}`}
-                  target="_blank"
-                  rel="sponsored nofollow noopener"
-                  className="block"
-                >
-                  <Button size="sm" className="w-full gap-1.5 font-semibold text-xs">
-                    <span>Acessar Fornecedor</span>
-                    <ExternalLink className="h-3 w-3" />
-                  </Button>
-                </Link>
-
-                <div className="text-[10px] text-slate-400">
-                  Verificado em {p.verifiedAt}
-                </div>
-              </div>
-            </div>
+        {products.length === 0 ? (
+          <Card className="p-8 text-center text-slate-500 text-sm">
+            Nenhum software publicado nesta categoria no momento. Nossos agentes de pesquisa estão auditando novas opções.
           </Card>
-        ))}
+        ) : (
+          products.map((p) => {
+            const lowestPrice = p.prices?.[0];
+            const priceText = lowestPrice
+              ? lowestPrice.price === 0
+                ? isPt ? "Grátis / A partir de $" + (p.prices?.[1]?.price || 0) : "Free Forever / From $" + (p.prices?.[1]?.price || 0)
+                : `$${lowestPrice.price} / mês`
+              : isPt ? "Preço Verificado" : "Audited Price";
+
+            return (
+              <Card key={p.slug} className="p-6 hover:border-slate-300 transition-all">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div className="space-y-3 max-w-3xl">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                        {p.name}
+                      </h2>
+                      <div className="flex items-center gap-1 text-xs font-bold text-amber-500">
+                        <Star className="h-4 w-4 fill-current" />
+                        <span>{p.rating_editorial}</span>
+                      </div>
+                      <Badge variant="verified" className="text-[11px]">
+                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                        Preços Verificados
+                      </Badge>
+                    </div>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {isPt ? p.short_description_pt : p.short_description_en}
+                    </p>
+
+                    {/* Features Badges */}
+                    {p.features && p.features.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {p.features.map((f) => (
+                          <span
+                            key={f.id}
+                            className="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                          >
+                            {isPt ? f.name_pt : f.name_en}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Pricing & CTA */}
+                  <div className="lg:w-64 shrink-0 rounded-xl bg-slate-50 p-4 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3 text-center">
+                    <div className="text-xs text-slate-500">Faixa de Preço</div>
+                    <div className="text-sm font-bold text-slate-900 dark:text-white">
+                      {priceText}
+                    </div>
+                    <div className="text-[11px] text-slate-400">
+                      {p.free_plan_available
+                        ? isPt ? "Plano Grátis Disponível" : "Free Plan Available"
+                        : `${p.free_trial_days || 14} dias de teste gratuito`}
+                    </div>
+
+                    <Link
+                      href={`/go/${p.slug}`}
+                      target="_blank"
+                      rel="sponsored nofollow noopener"
+                      className="block"
+                    >
+                      <Button size="sm" className="w-full gap-1.5 font-semibold text-xs">
+                        <span>Acessar Fornecedor</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                    </Link>
+
+                    <Link
+                      href={`/${locale}/software/${p.slug}`}
+                      className="text-[11px] font-medium text-blue-600 hover:underline block pt-1"
+                    >
+                      Ver Análise Completa
+                    </Link>
+                  </div>
+                </div>
+              </Card>
+            );
+          })
+        )}
       </div>
     </div>
   );

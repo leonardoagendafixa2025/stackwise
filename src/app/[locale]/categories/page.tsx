@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { getCategories } from "@/services/catalog";
 
 interface CategoriesPageProps {
   params: {
@@ -23,82 +24,27 @@ interface CategoriesPageProps {
   };
 }
 
-export default function CategoriesPage({ params }: CategoriesPageProps) {
+export const revalidate = 60;
+
+export default async function CategoriesPage({ params }: CategoriesPageProps) {
   const { locale } = params;
   const dict = getDictionary(locale);
+  const isPt = locale === "pt-br";
 
-  const categories = [
-    {
-      slug: "inteligencia-artificial",
-      title: locale === "pt-br" ? "Inteligência Artificial" : "Artificial Intelligence",
-      description: locale === "pt-br" ? "Assistentes inteligentes, modelos LLM e automações cognitivas corporativas." : "AI assistants, LLMs and enterprise cognitive automation.",
-      icon: Brain,
-      count: 24,
-    },
-    {
-      slug: "crm",
-      title: "CRM & Vendas",
-      description: locale === "pt-br" ? "Sistemas de gestão de relacionamento com o cliente e pipelines comerciais." : "Customer relationship management and sales pipelines.",
-      icon: Users,
-      count: 18,
-    },
-    {
-      slug: "automacao",
-      title: locale === "pt-br" ? "Automação No-Code" : "Workflow Automation",
-      description: locale === "pt-br" ? "Integração de APIs, gatilhos de dados e orquestração de processos." : "API integrations, data triggers and process orchestration.",
-      icon: Cpu,
-      count: 15,
-    },
-    {
-      slug: "marketing-digital",
-      title: "Marketing Digital",
-      description: locale === "pt-br" ? "Análise de tráfego, SEO técnico, métricas e aquisição multicanal." : "Traffic analytics, technical SEO and multi-channel acquisition.",
-      icon: TrendingUp,
-      count: 12,
-    },
-    {
-      slug: "email-marketing",
-      title: "E-mail Marketing",
-      description: locale === "pt-br" ? "Newsletters, sequências automatizadas e gestão de entregabilidade." : "Newsletters, automated email sequences and deliverability.",
-      icon: Mail,
-      count: 14,
-    },
-    {
-      slug: "produtividade",
-      title: locale === "pt-br" ? "Produtividade & Wikis" : "Productivity & Workspaces",
-      description: locale === "pt-br" ? "Gestão ágil de tarefas, bases de conhecimento e colaboração remota." : "Agile task tracking, knowledge wikis and remote collaboration.",
-      icon: CheckSquare,
-      count: 20,
-    },
-    {
-      slug: "gestao-empresarial",
-      title: locale === "pt-br" ? "Gestão Empresarial (ERP)" : "Business Management (ERP)",
-      description: locale === "pt-br" ? "Controle financeiro, emissão fiscal, faturamento e gestão operacional." : "Financial control, invoicing and operational management.",
-      icon: BarChart3,
-      count: 11,
-    },
-    {
-      slug: "criacao-de-sites",
-      title: locale === "pt-br" ? "Criação de Sites & Landing Pages" : "Website & Funnel Builders",
-      description: locale === "pt-br" ? "Construtores visuais de páginas, lojas online e CMS sem código." : "Visual page builders, online storefronts and no-code CMS.",
-      icon: Globe,
-      count: 16,
-    },
-    {
-      slug: "atendimento-ao-cliente",
-      title: locale === "pt-br" ? "Atendimento ao Cliente" : "Customer Support & Helpdesk",
-      description: locale === "pt-br" ? "Helpdesk, ticketing, live chat e chatbots de suporte com inteligência artificial." : "Helpdesk, ticketing, live chat and AI customer bots.",
-      icon: MessageSquare,
-      count: 13,
-    },
-    {
-      slug: "pequenas-empresas",
-      title: locale === "pt-br" ? "Ferramentas para Pequenas Empresas" : "Small Business Essentials",
-      description: locale === "pt-br" ? "Softwares acessíveis e enxutos para iniciar e acelerar pequenos negócios." : "Lean, accessible toolkits to launch and scale small ventures.",
-      icon: Briefcase,
-      count: 19,
-    },
-  ];
+  const categories = await getCategories();
+
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    "inteligencia-artificial": Brain,
+    "crm": Users,
+    "automacao": Cpu,
+    "marketing-digital": TrendingUp,
+    "email-marketing": Mail,
+    "produtividade": CheckSquare,
+    "gestao-empresarial": BarChart3,
+    "criacao-de-sites": Globe,
+    "atendimento-ao-cliente": MessageSquare,
+    "pequenas-empresas": Briefcase,
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-8">
@@ -107,7 +53,7 @@ export default function CategoriesPage({ params }: CategoriesPageProps) {
           {dict.nav.categories}
         </h1>
         <p className="text-sm text-slate-500 mt-2 max-w-2xl">
-          {locale === "pt-br"
+          {isPt
             ? "Explore nosso diretório estruturado de ferramentas SaaS. Todos os softwares listados passam por verificação editorial de preços e recursos."
             : "Explore our verified directory of enterprise SaaS solutions. All products are audited for pricing validity and technical capabilities."}
         </p>
@@ -115,7 +61,7 @@ export default function CategoriesPage({ params }: CategoriesPageProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((cat) => {
-          const Icon = cat.icon;
+          const Icon = iconMap[cat.slug] || Cpu;
           return (
             <Link key={cat.slug} href={`/${locale}/categories/${cat.slug}`}>
               <Card className="h-full hover:shadow-md hover:border-blue-400 dark:hover:border-blue-700 transition-all flex flex-col justify-between group">
@@ -125,15 +71,15 @@ export default function CategoriesPage({ params }: CategoriesPageProps) {
                       <Icon className="h-5 w-5" />
                     </div>
                     <Badge variant="secondary" className="text-xs">
-                      {cat.count} ferramentas
+                      Catálogo Ativo
                     </Badge>
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
-                      {cat.title}
+                      {isPt ? cat.name_pt : cat.name_en}
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                      {cat.description}
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed line-clamp-2">
+                      {isPt ? cat.description_pt : cat.description_en}
                     </p>
                   </div>
                 </div>

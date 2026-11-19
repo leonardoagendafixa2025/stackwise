@@ -13,8 +13,17 @@ import { BudgetGauge } from "@/components/admin/BudgetGauge";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import Link from "next/link";
+import { getAffiliateClickStats } from "@/services/affiliate";
+import { getProducts } from "@/services/catalog";
 
-export default function AdminDashboardPage() {
+export const revalidate = 0; // Fresh metrics
+
+export default async function AdminDashboardPage() {
+  const [clickStats, products] = await Promise.all([
+    getAffiliateClickStats(),
+    getProducts({ publishedOnly: false }),
+  ]);
+
   // Itens que requerem atenção estrita do proprietário (conforme Seção 12)
   const attentionItems: AttentionItem[] = [
     {
@@ -34,15 +43,6 @@ export default function AdminDashboardPage() {
       actionLabel: "Ver Programa",
       actionUrl: "/admin/affiliates",
       timeAgo: "há 5 horas",
-    },
-    {
-      id: "att-3",
-      title: "Lead Qualificado: Sistema de CRM para Distribuidora",
-      description: "Solicitação recebida via formulário de sistemas sob medida. O Agente Comercial elaborou um briefing técnico preliminar.",
-      severity: "urgent",
-      actionLabel: "Analisar Briefing",
-      actionUrl: "/admin/leads",
-      timeAgo: "há 1 dia",
     },
   ];
 
@@ -72,7 +72,7 @@ export default function AdminDashboardPage() {
         <div className="flex items-center gap-2">
           <Badge variant="verified" className="text-xs px-3 py-1 font-semibold gap-1.5">
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-            Saúde da Plataforma: Excelente
+            Banco Live Conectado ({products.length} Softwares Ativos)
           </Badge>
         </div>
       </div>
@@ -83,18 +83,18 @@ export default function AdminDashboardPage() {
       {/* Top Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <MetricCard
-          title="Visitantes Orgânicos (Semana)"
-          value="1.240"
-          subtitle="Tráfego direto e indexado"
-          delta="+18.4%"
+          title="Softwares Catalogados"
+          value={products.length}
+          subtitle="Auditados com fontes oficiais"
+          delta="100% Verificados"
           deltaType="positive"
           icon={Users}
         />
         <MetricCard
-          title="Cliques em Afiliados (/go/*)"
-          value="182"
-          subtitle="Taxa de clique (CTR): 14.6%"
-          delta="+5.2%"
+          title="Cliques Auditados (/go/*)"
+          value={clickStats.totalClicks}
+          subtitle={`Últimos 7 dias: ${clickStats.clicksLast7Days}`}
+          delta="Rastreamento Atômico"
           deltaType="positive"
           icon={MousePointerClick}
         />
@@ -109,7 +109,7 @@ export default function AdminDashboardPage() {
           title="Faturamento Acumulado"
           value="R$ 1.420,00"
           subtitle="Meta aspiracional: R$ 1.000.000"
-          delta="Fase 1 / Validação"
+          delta="Fase 2 / Monetização"
           deltaType="neutral"
           icon={TrendingUp}
         />
@@ -124,26 +124,23 @@ export default function AdminDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-sm flex items-center justify-between">
-                <span>Metas Financeiras</span>
-                <span className="text-xs font-normal text-slate-500">Próximo Marco</span>
+                <span>Cliques Mais Frequentes</span>
+                <span className="text-xs font-normal text-slate-500">Live DB</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-xs">
-              <div className="flex items-center justify-between font-medium">
-                <span className="text-slate-600">Primeira Comissão:</span>
-                <span className="text-emerald-600 font-bold">Conquistada (R$ 48,00)</span>
-              </div>
-              <div className="flex items-center justify-between font-medium">
-                <span className="text-slate-600">Marco R$ 1.000:</span>
-                <span className="text-emerald-600 font-bold">Atingido (R$ 1.420,00)</span>
-              </div>
-              <div className="flex items-center justify-between font-medium">
-                <span className="text-slate-600">Próximo Marco (R$ 10.000):</span>
-                <span className="text-blue-600 font-bold">14,2% concluído</span>
-              </div>
-              <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden mt-1">
-                <div className="h-full bg-blue-600" style={{ width: "14.2%" }} />
-              </div>
+            <CardContent className="space-y-2 text-xs">
+              {clickStats.topProducts.length === 0 ? (
+                <div className="text-slate-400 py-2">Nenhum clique registrado ainda.</div>
+              ) : (
+                clickStats.topProducts.map((p) => (
+                  <div key={p.name} className="flex justify-between items-center py-1">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">{p.name}</span>
+                    <Badge variant="secondary" className="font-mono text-[10px]">
+                      {p.count} cliques
+                    </Badge>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
