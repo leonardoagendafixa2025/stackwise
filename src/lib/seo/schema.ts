@@ -1,6 +1,6 @@
 import { DetailedProduct } from "@/services/catalog";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://stackwise.io";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://stackwisesigital.vercel.app";
 
 export function generateSoftwareApplicationSchema(product: DetailedProduct, locale: string = "pt-br") {
   const isPt = locale === "pt-br";
