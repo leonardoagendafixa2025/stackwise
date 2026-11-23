@@ -147,8 +147,8 @@ export async function bulkUpdateMargin(marginPct: number): Promise<{ updatedCoun
 export async function getStoreProducts(activeOnly = true): Promise<DigitalProductRecord[]> {
   const supabase = createAdminClient();
 
-  // Auto-sync in background every 30 minutes to pull new products and update live stock
-  if (Date.now() - lastAutoSyncTimestamp > 30 * 60 * 1000) {
+  // Auto-sync in background every 3 minutes (safest minimum interval to prevent supplier API bans)
+  if (Date.now() - lastAutoSyncTimestamp > 3 * 60 * 1000) {
     lastAutoSyncTimestamp = Date.now();
     syncProductsFromSuppliers(40).catch((err) =>
       console.warn("[AUTO SYNC DIGITAL PRODUCTS ERROR]", err)
@@ -221,6 +221,12 @@ export async function createDigitalOrder(input: {
 
   if (!product) {
     throw new Error("Produto digital não encontrado.");
+  }
+
+  if (product.stock_status === "out_of_stock") {
+    throw new Error(
+      "Este produto está temporariamente esgotado pelo fornecedor oficial. Não é possível gerar pedido no momento."
+    );
   }
 
   // Generate unique order code (e.g. STK-8492)

@@ -188,23 +188,43 @@ function CheckoutContent({ params }: CheckoutPageProps) {
 
               {/* Selected Product Summary */}
               {selectedProduct && (
-                <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/60 flex items-center justify-between">
-                  <div>
-                    <Badge variant="outline" className="text-[10px] mb-1">
-                      {selectedProduct.category}
-                    </Badge>
-                    <div className="font-bold text-sm text-slate-900 dark:text-white">
-                      {selectedProduct.name}
+                <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/60 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Badge variant="outline" className="text-[10px] mb-1">
+                        {selectedProduct.category}
+                      </Badge>
+                      <div className="font-bold text-sm text-slate-900 dark:text-white">
+                        {selectedProduct.name}
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+                        ${selectedProduct.sale_price.toFixed(2)} USDT
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        ~ R$ {(selectedProduct.sale_price * 5.85).toFixed(2)}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <div className="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
-                      ${selectedProduct.sale_price.toFixed(2)} USDT
-                    </div>
-                    <div className="text-[10px] text-slate-400">
-                      ~ R$ {(selectedProduct.sale_price * 5.85).toFixed(2)}
-                    </div>
+                  {/* Real-time stock status badge */}
+                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-xs">
+                    {selectedProduct.stock_status === "out_of_stock" ? (
+                      <span className="inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 font-semibold text-xs">
+                        <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                        {isPt ? "Esgotado temporariamente no fornecedor" : "Temporarily out of stock"}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                        {isPt ? "Estoque confirmado • Ativação imediata" : "In stock • Instant delivery"}
+                      </span>
+                    )}
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {isPt ? "API Verificada" : "API Verified"}
+                    </span>
                   </div>
                 </div>
               )}
@@ -238,11 +258,17 @@ function CheckoutContent({ params }: CheckoutPageProps) {
                 <div className="pt-2">
                   <Button
                     type="submit"
-                    disabled={generatingOrder}
+                    disabled={generatingOrder || selectedProduct?.stock_status === "out_of_stock"}
                     className="w-full gap-2 font-semibold text-sm"
                   >
                     <Sparkles className="h-4 w-4" />
-                    <span>{generatingOrder ? "Gerando Pedido..." : "Prosseguir para Pagamento Binance Pay"}</span>
+                    <span>
+                      {generatingOrder
+                        ? "Gerando Pedido..."
+                        : selectedProduct?.stock_status === "out_of_stock"
+                        ? (isPt ? "Produto Indisponível" : "Product Unavailable")
+                        : (isPt ? "Prosseguir para Pagamento Binance Pay" : "Proceed to Binance Pay")}
+                    </span>
                   </Button>
                 </div>
               </form>
