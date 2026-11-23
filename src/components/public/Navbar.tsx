@@ -128,7 +128,7 @@ export function Navbar({ locale }: NavbarProps) {
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-sm font-semibold">
           {/* Categories Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative" ref={dropdownRef} onMouseLeave={() => setCategoriesOpen(false)}>
             <button
               onClick={() => setCategoriesOpen(!categoriesOpen)}
               onMouseEnter={() => setCategoriesOpen(true)}
@@ -149,11 +149,10 @@ export function Navbar({ locale }: NavbarProps) {
               />
             </button>
 
-            {/* Dropdown Menu */}
+            {/* Dropdown Menu - 100% Solid Opaque Background */}
             {categoriesOpen && (
               <div
-                onMouseLeave={() => setCategoriesOpen(false)}
-                className="absolute left-0 top-full mt-2 w-84 rounded-2xl border border-slate-200/90 bg-white/98 p-3.5 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:border-slate-800 dark:bg-slate-900/98 animate-in fade-in-50 slide-in-from-top-2 duration-150 z-50"
+                className="absolute left-0 top-full mt-2 w-80 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xl ring-1 ring-slate-900/10 dark:border-slate-800 dark:bg-slate-900 dark:ring-white/10 animate-in fade-in-50 slide-in-from-top-2 duration-150 z-50"
               >
                 <div className="px-2.5 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   {isPt ? "Categorias Auditadas" : "Audited Categories"}
@@ -284,7 +283,7 @@ export function Navbar({ locale }: NavbarProps) {
 
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 bg-white/98 backdrop-blur-xl px-4 py-5 dark:border-slate-800 dark:bg-slate-950/98 animate-in slide-in-from-top-3 duration-200 space-y-4 shadow-xl">
+        <div className="md:hidden border-b border-slate-200 bg-white px-4 py-5 dark:border-slate-800 dark:bg-slate-950 animate-in slide-in-from-top-3 duration-200 space-y-4 shadow-2xl z-50">
           {/* Mobile Search Input */}
           <form onSubmit={handleSearchSubmit} className="relative">
             <input

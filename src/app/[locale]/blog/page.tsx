@@ -23,7 +23,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
   const articles = await getPublishedArticles(locale);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-10">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-10 min-h-[70vh]">
       <div>
         <Badge variant="verified" className="mb-3">
           <ShieldCheck className="h-3.5 w-3.5 mr-1" />
