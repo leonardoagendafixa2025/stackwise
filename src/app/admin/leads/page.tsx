@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
-export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 export default async function AdminLeadsPage() {
   const supabase = createAdminClient();
@@ -24,29 +24,7 @@ export default async function AdminLeadsPage() {
     .select("*")
     .order("created_at", { ascending: false });
 
-  // Default sample leads if none in database yet to ensure rich experience
-  const displayLeads = (leads && leads.length > 0) ? leads : [
-    {
-      id: "demo-lead-1",
-      contact_name: "Marcelo Albuquerque",
-      contact_email: "marcelo@albuquerquelog.com.br",
-      company_name: "Albuquerque Logística",
-      project_summary: "Necessitamos de integração entre nosso CRM (HubSpot) e sistema legado de rastreamento com disparos de notificações automáticas via WhatsApp para motoristas e clientes.",
-      budget_range: "R$ 15.000 - R$ 30.000",
-      status: "new",
-      created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-    },
-    {
-      id: "demo-lead-2",
-      contact_name: "Fernanda Silveira",
-      contact_email: "fernanda@clinicacura.med.br",
-      company_name: "Rede Clínica Cura",
-      project_summary: "Desenvolvimento de portal de autoagendamento médico inteligente integrado com prontuário eletrônico e cobrança automática Pix.",
-      budget_range: "R$ 30.000 - R$ 60.000",
-      status: "qualified",
-      created_at: new Date(Date.now() - 28 * 3600 * 1000).toISOString(),
-    },
-  ];
+  const displayLeads = leads || [];
 
   const statusMap: Record<string, { label: string; badgeVariant: "verified" | "secondary" | "outline" | "destructive" }> = {
     new: { label: "Novo Lead", badgeVariant: "verified" },
@@ -100,9 +78,9 @@ export default async function AdminLeadsPage() {
             <DollarSign className="h-4 w-4 text-emerald-600" />
           </div>
           <div className="text-2xl font-extrabold text-emerald-600 mt-2">
-            R$ 45.000+
+            {displayLeads.length > 0 ? (displayLeads[0].budget_range || "Sob Consulta") : "R$ 0,00"}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Valor médio de projetos</div>
+          <div className="text-[11px] text-slate-400 mt-1">Orçamento das demandas</div>
         </Card>
 
         <Card className="p-5">
@@ -122,14 +100,19 @@ export default async function AdminLeadsPage() {
         <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
           <CardTitle className="text-sm font-bold text-slate-900 dark:text-white flex items-center justify-between">
             <span>Todas as Solicitações Recebidas</span>
-            <span className="text-xs font-normal text-slate-400">{displayLeads.length} registros</span>
+            <span className="text-xs font-normal text-slate-400">{displayLeads.length} registro(s)</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
-            {displayLeads.map((lead) => {
-              const statusCfg = statusMap[lead.status] || { label: lead.status, badgeVariant: "secondary" };
-              return (
+          {displayLeads.length === 0 ? (
+            <div className="p-8 text-center text-xs text-slate-400">
+              Nenhuma solicitação de orçamento recebida ainda.
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              {displayLeads.map((lead) => {
+                const statusCfg = statusMap[lead.status] || { label: lead.status, badgeVariant: "secondary" };
+                return (
                 <div key={lead.id} className="p-5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
@@ -191,6 +174,7 @@ export default async function AdminLeadsPage() {
               );
             })}
           </div>
+        )}
         </CardContent>
       </Card>
     </div>
