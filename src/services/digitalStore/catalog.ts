@@ -43,11 +43,13 @@ export interface DigitalOrderRecord {
 // In-memory cache fallback to ensure the store is immediately functional even before migration execution
 let inMemoryProductsCache: DigitalProductRecord[] = [];
 const inMemoryOrdersCache: DigitalOrderRecord[] = [];
+let lastAutoSyncTimestamp = 0;
 
 export async function syncProductsFromSuppliers(defaultMarginPct = 40): Promise<{
   syncedCount: number;
   products: DigitalProductRecord[];
 }> {
+  lastAutoSyncTimestamp = Date.now();
   const supplierProducts = await fetchAllSupplierProducts();
   const supabase = createAdminClient();
 
@@ -74,31 +76,33 @@ export async function syncProductsFromSuppliers(defaultMarginPct = 40): Promise<
       stock_status: sp.inStock ? "in_stock" : "out_of_stock",
     };
 
-    // Try upserting to Supabase
-    try {
-      await supabase
-        .from("digital_products")
-        .upsert(
-          {
-            supplier_code: sp.supplierCode,
-            external_product_id: sp.externalId,
-            name: sp.name,
-            category: sp.category,
-            description: sp.description,
-            cost_price: cost,
-            sale_price: sale,
-            profit_margin_pct: defaultMarginPct,
-            currency: "USDT",
-            is_active: true,
-            stock_status: record.stock_status,
-          },
-          { onConflict: "supplier_code, external_product_id" }
-        );
-    } catch {
-      // In-memory fallback
-    }
-
     synced.push(record);
+  }
+
+  // Fast Batch Upsert in chunks of 50 to avoid Vercel Serverless timeouts
+  try {
+    const payload = synced.map((r) => ({
+      supplier_code: r.supplier_code,
+      external_product_id: r.external_product_id,
+      name: r.name,
+      category: r.category,
+      description: r.description,
+      cost_price: r.cost_price,
+      sale_price: r.sale_price,
+      profit_margin_pct: r.profit_margin_pct,
+      currency: "USDT",
+      is_active: true,
+      stock_status: r.stock_status,
+    }));
+
+    for (let i = 0; i < payload.length; i += 50) {
+      const chunk = payload.slice(i, i + 50);
+      await supabase.from("digital_products").upsert(chunk, {
+        onConflict: "supplier_code, external_product_id",
+      });
+    }
+  } catch (err) {
+    console.warn("[BATCH SYNC ERROR]", err);
   }
 
   inMemoryProductsCache = synced;
@@ -108,8 +112,48 @@ export async function syncProductsFromSuppliers(defaultMarginPct = 40): Promise<
   };
 }
 
+export async function bulkUpdateMargin(marginPct: number): Promise<{ updatedCount: number }> {
+  const supabase = createAdminClient();
+
+  // 1. Fetch current database products
+  const { data: prods } = await supabase
+    .from("digital_products")
+    .select("id, cost_price");
+
+  if (prods && prods.length > 0) {
+    const updates = prods.map((p) => ({
+      id: p.id,
+      profit_margin_pct: marginPct,
+      sale_price: Number((p.cost_price * (1 + marginPct / 100)).toFixed(2)),
+    }));
+
+    // Batch update in chunks of 50
+    for (let i = 0; i < updates.length; i += 50) {
+      const chunk = updates.slice(i, i + 50);
+      await supabase.from("digital_products").upsert(chunk, { onConflict: "id" });
+    }
+  }
+
+  // Update in-memory cache as well
+  inMemoryProductsCache = inMemoryProductsCache.map((p) => ({
+    ...p,
+    profit_margin_pct: marginPct,
+    sale_price: Number((p.cost_price * (1 + marginPct / 100)).toFixed(2)),
+  }));
+
+  return { updatedCount: prods ? prods.length : inMemoryProductsCache.length };
+}
+
 export async function getStoreProducts(activeOnly = true): Promise<DigitalProductRecord[]> {
   const supabase = createAdminClient();
+
+  // Auto-sync in background every 30 minutes to pull new products and update live stock
+  if (Date.now() - lastAutoSyncTimestamp > 30 * 60 * 1000) {
+    lastAutoSyncTimestamp = Date.now();
+    syncProductsFromSuppliers(40).catch((err) =>
+      console.warn("[AUTO SYNC DIGITAL PRODUCTS ERROR]", err)
+    );
+  }
 
   try {
     let query = supabase.from("digital_products").select("*").order("name");
@@ -126,7 +170,7 @@ export async function getStoreProducts(activeOnly = true): Promise<DigitalProduc
 
   // If DB empty or not yet migrated, initialize cache with live suppliers!
   if (inMemoryProductsCache.length === 0) {
-    await syncProductsFromSuppliers(35);
+    await syncProductsFromSuppliers(40);
   }
 
   if (activeOnly) {

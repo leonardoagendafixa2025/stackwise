@@ -74,6 +74,39 @@ export default function AdminStorePage() {
     }
   };
 
+  const handleApplyBulkMargin = async () => {
+    setSyncing(true);
+    // Instant optimistic UI update
+    setProducts((prev) =>
+      prev.map((p) => {
+        const newSale = Number((p.cost_price * (1 + globalMargin / 100)).toFixed(2));
+        return {
+          ...p,
+          profit_margin_pct: globalMargin,
+          sale_price: newSale,
+        };
+      })
+    );
+
+    try {
+      const res = await fetch("/api/admin/store", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bulkMargin: globalMargin }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Falha ao aplicar margem");
+
+      loadStoreAdminData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro desconhecido";
+      alert(msg);
+      loadStoreAdminData();
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const handleUpdateMargin = async (productId: string, newSalePrice: number, newMargin: number) => {
     try {
       const res = await fetch("/api/admin/store", {
@@ -221,10 +254,11 @@ export default function AdminStorePage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={handleSyncSuppliers}
+            onClick={handleApplyBulkMargin}
+            disabled={syncing}
             className="text-xs font-semibold"
           >
-            Aplicar em Massa
+            {syncing ? "Aplicando..." : "Aplicar em Massa"}
           </Button>
         </div>
       </Card>
@@ -315,6 +349,7 @@ export default function AdminStorePage() {
                         <td className="px-4 py-3.5 text-center">
                           <div className="inline-flex items-center gap-1">
                             <input
+                              key={`${p.id}_${p.profit_margin_pct}`}
                               type="number"
                               min="0"
                               max="300"

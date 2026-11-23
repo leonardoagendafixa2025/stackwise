@@ -3,6 +3,7 @@ import {
   getStoreProducts,
   syncProductsFromSuppliers,
   updateProductPricing,
+  bulkUpdateMargin,
   getRecentDigitalOrders,
 } from "@/services/digitalStore/catalog";
 import { getAllSupplierBalances } from "@/services/digitalStore/suppliers";
@@ -50,10 +51,20 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, sale_price, profit_margin_pct, is_active } = body;
+    const { id, sale_price, profit_margin_pct, is_active, bulkMargin } = body;
+
+    // Handle bulk margin update across all catalog products
+    if (bulkMargin !== undefined) {
+      const margin = Number(bulkMargin) || 40;
+      const res = await bulkUpdateMargin(margin);
+      return NextResponse.json({
+        success: true,
+        message: `Margem de ${margin}% aplicada em massa a ${res.updatedCount} produtos.`,
+      });
+    }
 
     if (!id) {
-      return NextResponse.json({ error: "id é obrigatório." }, { status: 400 });
+      return NextResponse.json({ error: "id ou bulkMargin é obrigatório." }, { status: 400 });
     }
 
     const updated = await updateProductPricing(id, {
