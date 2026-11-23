@@ -1,5 +1,6 @@
 import React from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 import { User } from "lucide-react";
 
 export default function AdminLayout({
@@ -20,7 +21,7 @@ export default function AdminLayout({
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <div className="text-right">
               <div className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                 Proprietário (CLT Supervisor)
@@ -30,6 +31,7 @@ export default function AdminLayout({
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200 font-bold text-xs">
               <User className="h-4 w-4" />
             </div>
+            <AdminLogoutButton />
           </div>
         </header>
 
