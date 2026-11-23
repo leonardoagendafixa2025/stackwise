@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getAffiliateNetworks } from "@/services/affiliate";
 import { getProducts } from "@/services/catalog";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const [networks, products] = await Promise.all([

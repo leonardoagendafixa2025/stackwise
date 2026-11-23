@@ -5,6 +5,8 @@ import {
   getOperationalCostsList,
 } from "@/services/financial";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const [summary, conversions, costs] = await Promise.all([
