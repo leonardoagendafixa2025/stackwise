@@ -20,6 +20,7 @@ export default function CustomSystemsPage({ params }: CustomSystemsPageProps) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    whatsapp: "",
     company: "",
     summary: "",
     budget: "R$ 5.000 a R$ 15.000",
@@ -99,6 +100,22 @@ export default function CustomSystemsPage({ params }: CustomSystemsPageProps) {
               </div>
 
               <div className="space-y-2">
+                <label className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>{isPt ? "WhatsApp / Celular com DDD *" : "WhatsApp / Phone *"}</span>
+                </label>
+                <Input
+                  required
+                  type="tel"
+                  value={formData.whatsapp}
+                  onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                  placeholder={isPt ? "(11) 99999-9999" : "+1 (555) 000-0000"}
+                  className="border-emerald-300 focus:ring-emerald-500 dark:border-emerald-700"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                   {isPt ? "E-mail Profissional *" : "Business Email *"}
                 </label>
@@ -110,17 +127,17 @@ export default function CustomSystemsPage({ params }: CustomSystemsPageProps) {
                   placeholder={isPt ? "seuemail@empresa.com" : "you@company.com"}
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
-                {isPt ? "Nome da Empresa ou Projeto" : "Company or Project Name"}
-              </label>
-              <Input
-                value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                placeholder={isPt ? "ex: Logística Rápida Ltda" : "e.g. Acme Corp"}
-              />
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                  {isPt ? "Nome da Empresa ou Projeto" : "Company or Project Name"}
+                </label>
+                <Input
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  placeholder={isPt ? "ex: Logística Rápida Ltda" : "e.g. Acme Corp"}
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

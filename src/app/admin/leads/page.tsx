@@ -12,10 +12,17 @@ import {
   Clock,
   Sparkles,
   ExternalLink,
+  MessageCircle,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+function extractWhatsApp(lead: { project_summary?: string; company_name?: string | null }) {
+  const match = lead.project_summary?.match(/\[WhatsApp:\s*([^\]]+)\]/) 
+    || lead.company_name?.match(/WhatsApp:\s*([^\s•]+)/);
+  return match ? match[1].trim() : null;
+}
 
 export default async function AdminLeadsPage() {
   const supabase = createAdminClient();
@@ -112,6 +119,16 @@ export default async function AdminLeadsPage() {
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {displayLeads.map((lead) => {
                 const statusCfg = statusMap[lead.status] || { label: lead.status, badgeVariant: "secondary" };
+                const rawWhatsApp = extractWhatsApp(lead);
+                const cleanPhone = rawWhatsApp ? rawWhatsApp.replace(/\D/g, "") : null;
+                const fullPhone = cleanPhone ? (cleanPhone.startsWith("55") ? cleanPhone : "55" + cleanPhone) : null;
+                const cleanSummary = lead.project_summary?.replace(/\[WhatsApp:\s*[^\]]+\]\s*/g, "").trim() || lead.project_summary;
+                const cleanCompany = lead.company_name?.replace(/•?\s*WhatsApp:\s*[^\s•]+/g, "").trim() || lead.company_name;
+
+                const whatsappMsg = encodeURIComponent(
+                  `Olá ${lead.contact_name}! Aqui é da equipe técnica da STACKWISE. Recebemos seu briefing de projeto sobre "${cleanSummary.slice(0, 80)}..." e gostaríamos de alinhar os detalhes e orçamento com você!`
+                );
+
                 return (
                 <div key={lead.id} className="p-5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -126,17 +143,23 @@ export default async function AdminLeadsPage() {
                             {statusCfg.label}
                           </Badge>
                         </div>
-                        <div className="text-xs text-slate-500 flex items-center gap-3 mt-0.5">
-                          {lead.company_name && (
+                        <div className="text-xs text-slate-500 flex flex-wrap items-center gap-3 mt-0.5">
+                          {cleanCompany && (
                             <span className="flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300">
                               <Building2 className="h-3 w-3 text-slate-400" />
-                              {lead.company_name}
+                              {cleanCompany}
                             </span>
                           )}
                           <span className="flex items-center gap-1">
                             <Mail className="h-3 w-3 text-slate-400" />
                             {lead.contact_email}
                           </span>
+                          {rawWhatsApp && (
+                            <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded text-[11px]">
+                              <MessageCircle className="h-3 w-3 text-emerald-500" />
+                              {rawWhatsApp}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -156,17 +179,43 @@ export default async function AdminLeadsPage() {
                     <span className="font-semibold text-slate-900 dark:text-white block mb-1">
                       Briefing do Desafio Técnico:
                     </span>
-                    {lead.project_summary}
+                    {cleanSummary}
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 pt-1">
+                  <div className="flex flex-wrap items-center justify-end gap-2.5 pt-1">
+                    {fullPhone ? (
+                      <a
+                        href={`https://wa.me/${fullPhone}?text=${whatsappMsg}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex"
+                      >
+                        <Button size="sm" className="text-xs gap-1.5 h-8 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs">
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          <span>Chamar no WhatsApp ({rawWhatsApp})</span>
+                        </Button>
+                      </a>
+                    ) : (
+                      <a
+                        href={`https://web.whatsapp.com/send?text=${encodeURIComponent(`Olá ${lead.contact_name}! Aqui é da STACKWISE sobre o briefing que você enviou!`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex"
+                      >
+                        <Button size="sm" variant="outline" className="text-xs gap-1.5 h-8 text-emerald-700 border-emerald-300 hover:bg-emerald-50 dark:text-emerald-400">
+                          <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
+                          <span>WhatsApp Web</span>
+                        </Button>
+                      </a>
+                    )}
+
                     <a
-                      href={`mailto:${lead.contact_email}?subject=Briefing STACKWISE - Projeto ${lead.company_name || ""}`}
+                      href={`mailto:${lead.contact_email}?subject=Briefing STACKWISE - Projeto ${cleanCompany || ""}`}
                       className="inline-flex"
                     >
-                      <Button size="sm" variant="outline" className="text-xs gap-1 h-8">
+                      <Button size="sm" variant="outline" className="text-xs gap-1 h-8 text-slate-600">
                         <Mail className="h-3 w-3" />
-                        <span>Responder por E-mail</span>
+                        <span>E-mail</span>
                       </Button>
                     </a>
                   </div>

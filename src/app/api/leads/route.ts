@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, company, summary, budget } = body;
+    const { name, email, whatsapp, company, summary, budget } = body;
 
     if (!name || !email || !summary) {
       return NextResponse.json(
@@ -13,6 +13,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const formattedSummary = whatsapp
+      ? `[WhatsApp: ${whatsapp}]\n\n${summary}`
+      : summary;
+
+    const formattedCompany = company
+      ? `${company}${whatsapp ? ` • WhatsApp: ${whatsapp}` : ""}`
+      : (whatsapp ? `WhatsApp: ${whatsapp}` : null);
+
     const supabase = createAdminClient();
 
     const { data, error } = await supabase
@@ -20,8 +28,8 @@ export async function POST(request: NextRequest) {
       .insert({
         contact_name: name,
         contact_email: email,
-        company_name: company || null,
-        project_summary: summary,
+        company_name: formattedCompany,
+        project_summary: formattedSummary,
         budget_range: budget || null,
         status: "new",
       })
