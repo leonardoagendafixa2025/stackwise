@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Info } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { type Locale, getDictionary } from "@/lib/i18n/dictionaries";
 
 interface AffiliateDisclosureBannerProps {
@@ -11,21 +11,21 @@ export function AffiliateDisclosureBanner({ locale }: AffiliateDisclosureBannerP
   const dict = getDictionary(locale);
 
   return (
-    <div className="border-b border-blue-100 bg-blue-50/70 px-4 py-2.5 text-xs text-blue-900 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-200">
+    <div className="border-b border-slate-200/80 bg-slate-900 text-slate-300 px-4 py-2 text-[11px] font-medium tracking-wide">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2">
-          <Info className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
-          <span>
+        <div className="flex items-center gap-2 truncate">
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+          <span className="truncate">
             {locale === "pt-br"
-              ? "Transparência: Alguns links nesta página são links de afiliados. Não cobramos nada a mais de você e mantemos rigorosa independência editorial."
-              : "Disclosure: Some links on this site are affiliate links. We may earn a commission at no cost to you, with zero influence on our ratings."}
+              ? "Transparência Editorial: Avaliações técnicas 100% independentes. Alguns links podem gerar comissão de afiliados sem custo extra para você."
+              : "Editorial Transparency: 100% independent technical evaluations. Partner links may earn commissions at zero extra cost to you."}
           </span>
         </div>
         <Link
           href={`/${locale}/affiliate-disclosure`}
-          className="shrink-0 font-medium underline underline-offset-2 hover:text-blue-700 dark:hover:text-blue-300"
+          className="shrink-0 text-white font-semibold hover:text-emerald-300 underline underline-offset-4 transition-colors"
         >
-          {dict.home.howWeEvaluate}
+          {dict.home.howWeEvaluate} →
         </Link>
       </div>
     </div>

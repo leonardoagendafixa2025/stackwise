@@ -63,7 +63,7 @@ export default async function SoftwareDetailPage({ params }: SoftwarePageProps) 
       </nav>
 
       {/* Main Header Hero */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-3xl border border-slate-200/90 bg-white p-7 sm:p-10 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-4 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
