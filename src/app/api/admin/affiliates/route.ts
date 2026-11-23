@@ -20,7 +20,8 @@ export async function GET() {
       supabase
         .from("affiliate_networks")
         .select("*")
-        .order("is_active", { ascending: false }),
+        .eq("is_active", true)
+        .order("name", { ascending: true }),
       supabase
         .from("categories")
         .select("id, name_pt, slug")
