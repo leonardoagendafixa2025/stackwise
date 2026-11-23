@@ -15,7 +15,10 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://stackwise.io"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://stackwisesigital.vercel.app")
+  ),
   title: {
     default: "STACKWISE — Discover. Compare. Choose Smarter.",
     template: "%s | STACKWISE",

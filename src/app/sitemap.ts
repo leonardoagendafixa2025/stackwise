@@ -2,7 +2,9 @@ import { MetadataRoute } from "next";
 import { getCategories, getProducts } from "@/services/catalog";
 import { getPublishedArticles } from "@/services/content";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://stackwise.io";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://stackwisesigital.vercel.app");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [categories, products, articlesPt, articlesEn] = await Promise.all([
