@@ -30,35 +30,16 @@ export default async function AdminDashboardPage() {
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val);
 
   // Itens que requerem atenção estrita do proprietário (conforme Seção 12)
-  const attentionItems: AttentionItem[] = [
-    {
-      id: "att-1",
-      title: "Rascunho de Comparação Gerado: HubSpot vs ActiveCampaign",
-      description: "O Agente Editorial produziu um rascunho com 1.450 palavras. Requer revisão humana e checagem de fontes antes de publicação.",
-      severity: "review",
-      actionLabel: "Revisar Conteúdo",
-      actionUrl: "/admin/editorial",
-      timeAgo: "há 2 horas",
-    },
-    {
-      id: "att-2",
-      title: "Novo Programa de Afiliados Descoberto: Notion Partner Program",
-      description: "O Agente Pesquisador identificou comissão recorrente de 50% no primeiro ano via PartnerStack. Aguarda aprovação para submissão.",
-      severity: "warning",
-      actionLabel: "Ver Programa",
-      actionUrl: "/admin/affiliates",
-      timeAgo: "há 5 horas",
-    },
-  ];
+  const attentionItems: AttentionItem[] = [];
 
   const agentStatuses = [
-    { code: "AGENT_1_RESEARCHER", name: "1. Pesquisador", status: "Em Espera", task: "Varredura periódica de novos SaaS", runsToday: 3 },
-    { code: "AGENT_2_SEO", name: "2. SEO & Keywords", status: "Concluído", task: "Mapeamento de intenção comercial", runsToday: 2 },
-    { code: "AGENT_3_EDITORIAL", name: "3. Editorial", status: "Aguardando Aprovação", task: "Rascunho de comparativo gerado", runsToday: 1 },
-    { code: "AGENT_4_AUDITOR", name: "4. Auditor Técnico", status: "Concluído", task: "Checagem de integridade de links (100% OK)", runsToday: 4 },
-    { code: "AGENT_5_GROWTH", name: "5. Growth & CTR", status: "Em Espera", task: "Análise de CTR agregada por bloco", runsToday: 1 },
+    { code: "AGENT_1_RESEARCHER", name: "1. Pesquisador", status: "Em Espera", task: "Varredura periódica de novos SaaS", runsToday: 0 },
+    { code: "AGENT_2_SEO", name: "2. SEO & Keywords", status: "Em Espera", task: "Mapeamento de intenção comercial", runsToday: 0 },
+    { code: "AGENT_3_EDITORIAL", name: "3. Editorial", status: "Em Espera", task: "Rascunho de comparativo gerado", runsToday: 0 },
+    { code: "AGENT_4_AUDITOR", name: "4. Auditor Técnico", status: "Em Espera", task: "Checagem de integridade de links (100% OK)", runsToday: 0 },
+    { code: "AGENT_5_GROWTH", name: "5. Growth & CTR", status: "Em Espera", task: "Análise de CTR agregada por bloco", runsToday: 0 },
     { code: "AGENT_6_FINANCIAL", name: "6. Financeiro", status: "Em Espera", task: "Pronto para processamento de CSV", runsToday: 0 },
-    { code: "AGENT_7_COMMERCIAL", name: "7. Comercial", status: "Ativo", task: "Briefing de demanda sintetizado", runsToday: 1 },
+    { code: "AGENT_7_COMMERCIAL", name: "7. Comercial", status: "Em Espera", task: "Briefing de demanda sintetizado", runsToday: 0 },
   ];
 
   return (
