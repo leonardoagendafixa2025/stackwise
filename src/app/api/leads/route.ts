@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, whatsapp, company, summary, budget } = body;
 
-    if (!name || !email || !summary) {
+    if (!name || !email || !whatsapp || !whatsapp.trim() || !summary) {
       return NextResponse.json(
-        { error: "Nome, e-mail e resumo do projeto são obrigatórios." },
+        { error: "Nome, WhatsApp com DDD, e-mail e resumo do projeto são obrigatórios." },
         { status: 400 }
       );
     }

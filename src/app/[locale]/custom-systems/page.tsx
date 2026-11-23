@@ -34,16 +34,21 @@ export default function CustomSystemsPage({ params }: CustomSystemsPageProps) {
 
     try {
       // Send lead to backend API
-      await fetch("/api/leads", {
+      const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || (isPt ? "Por favor, preencha todos os campos obrigatórios, incluindo WhatsApp com DDD." : "Please fill in all required fields including WhatsApp."));
+        return;
+      }
+
       setSubmitted(true);
     } catch {
-      // In dev or offline mode, simulate success response
-      setSubmitted(true);
+      alert(isPt ? "Erro de conexão ao enviar o formulário. Tente novamente." : "Connection error. Please try again.");
     } finally {
       setLoading(false);
     }
