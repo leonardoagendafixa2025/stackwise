@@ -4,8 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { type Locale } from "@/lib/i18n/dictionaries";
-import { Navbar } from "@/components/public/Navbar";
-import { Footer } from "@/components/public/Footer";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -157,22 +155,15 @@ function CheckoutContent({ params }: CheckoutPageProps) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
-        <Navbar locale={params.locale} />
-        <div className="flex-1 flex items-center justify-center p-8 text-slate-500">
-          Carregando checkout...
-        </div>
-        <Footer locale={params.locale} />
+      <div className="flex items-center justify-center py-20 text-slate-500">
+        Carregando checkout...
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
-      <Navbar locale={params.locale} />
-
-      <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl space-y-6">
+    <div className="py-12 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl space-y-6">
           <Link
             href={`/${params.locale}/store`}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
@@ -424,9 +415,6 @@ function CheckoutContent({ params }: CheckoutPageProps) {
             </Card>
           )}
         </div>
-      </main>
-
-      <Footer locale={params.locale} />
     </div>
   );
 }

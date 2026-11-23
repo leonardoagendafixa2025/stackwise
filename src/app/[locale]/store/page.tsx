@@ -1,9 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { type Locale } from "@/lib/i18n/dictionaries";
-import { Navbar } from "@/components/public/Navbar";
-import { Footer } from "@/components/public/Footer";
-import { AffiliateDisclosureBanner } from "@/components/public/AffiliateDisclosureBanner";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -29,12 +26,8 @@ export default async function StorePage({ params }: StorePageProps) {
   const products = await getStoreProducts(true);
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
-      <Navbar locale={params.locale} />
-      <AffiliateDisclosureBanner locale={params.locale} />
-
-      <main className="flex-1 pb-20">
-        {/* Hero Section */}
+    <div className="space-y-12 pb-20">
+      {/* Hero Section */}
         <div className="border-b border-slate-200/80 bg-white/70 py-12 dark:border-slate-800 dark:bg-slate-900/40">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
@@ -147,9 +140,6 @@ export default async function StorePage({ params }: StorePageProps) {
             </div>
           )}
         </div>
-      </main>
-
-      <Footer locale={params.locale} />
     </div>
   );
 }
